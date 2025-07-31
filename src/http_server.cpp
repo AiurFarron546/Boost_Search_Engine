@@ -423,7 +423,6 @@ std::string HttpConnection::convert_gbk_to_utf8(const std::string& gbk_content) 
 
 std::string HttpConnection::simple_gbk_to_utf8(const std::string& gbk_content) {
     // 简单的GBK到UTF-8转换（仅处理常见字符）
-    // 这是一个备用方案，实际项目中建议使用专业的编码转换库
 
     std::string result;
     result.reserve(gbk_content.length() * 2);
