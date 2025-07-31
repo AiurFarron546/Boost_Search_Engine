@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boost搜索引擎</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 头部区域 -->
+        <header class="header">
+            <h1 class="logo">Boost搜索</h1>
+            <p class="subtitle">基于C++和Boost库的高性能搜索引擎</p>
+        </header>
+
+        <!-- 搜索区域 -->
+        <main class="search-section">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="请输入搜索关键词..." autocomplete="off">
+                <button id="searchButton" type="button">搜索</button>
+            </div>
+            
+            <!-- 搜索建议 -->
+            <div id="suggestions" class="suggestions"></div>
+        </main>
+
+        <!-- 结果区域 -->
+        <section id="resultsSection" class="results-section" style="display: none;">
+            <div class="results-header">
+                <span id="resultsCount">找到 0 个结果</span>
+                <span id="searchTime"></span>
+            </div>
+            <div id="resultsList" class="results-list"></div>
+        </section>
+
+        <!-- 加载动画 -->
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>正在搜索...</p>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="footer">
+            <p>&copy; 2024 Boost搜索引擎 - 使用C++11和Boost库构建</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搜索引擎测试页面</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .test-case {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+        
+        .test-case h3 {
+            margin-top: 0;
+            color: #666;
+        }
+        
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background: #0056b3;
+        }
+        
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            background: #e9ecef;
+            white-space: pre-wrap;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2rem;
+        }
+        
+        .status.online {
+            color: #28a745;
+        }
+        
+        .status.offline {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔍 Boost搜索引擎测试页面</h1>
+        
+        <div id="serverStatus" class="status">检查服务器状态中...</div>
+        
+        <div class="test-case">
+            <h3>测试用例1：基础搜索功能</h3>
+            <button onclick="testSearch('C++')">搜索 "C++"</button>
+            <button onclick="testSearch('Boost')">搜索 "Boost"</button>
+            <button onclick="testSearch('搜索引擎')">搜索 "搜索引擎"</button>
+            <div id="result1" class="result" style="display:none;"></div>
+        </div>
+        
+        <div class="test-case">
+            <h3>测试用例2：多关键词搜索</h3>
+            <button onclick="testSearch('C++ 编程')">搜索 "C++ 编程"</button>
+            <button onclick="testSearch('网络 编程')">搜索 "网络 编程"</button>
+            <button onclick="testSearch('多线程 安全')">搜索 "多线程 安全"</button>
+            <div id="result2" class="result" style="display:none;"></div>
+        </div>
+        
+        <div class="test-case">
+            <h3>测试用例3：英文搜索</h3>
+            <button onclick="testSearch('thread')">搜索 "thread"</button>
+            <button onclick="testSearch('algorithm')">搜索 "algorithm"</button>
+            <button onclick="testSearch('asio')">搜索 "asio"</button>
+            <div id="result3" class="result" style="display:none;"></div>
+        </div>
+        
+        <div class="test-case">
+            <h3>测试用例4：边界情况</h3>
+            <button onclick="testSearch('')">空查询</button>
+            <button onclick="testSearch('xyz123notfound')">不存在的词</button>
+            <button onclick="testSearch('的 了 在')">只有停用词</button>
+            <div id="result4" class="result" style="display:none;"></div>
+        </div>
+        
+        <div class="test-case">
+            <h3>性能测试</h3>
+            <button onclick="performanceTest()">执行性能测试</button>
+            <div id="performanceResult" class="result" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script>
+        let testCounter = 0;
+        
+        // 检查服务器状态
+        async function checkServerStatus() {
+            try {
+                const response = await fetch('/');
+                if (response.ok) {
+                    document.getElementById('serverStatus').innerHTML = '✅ 服务器在线 (http://localhost:8080)';
+                    document.getElementById('serverStatus').className = 'status online';
+                } else {
+                    throw new Error('服务器响应异常');
+                }
+            } catch (error) {
+                document.getElementById('serverStatus').innerHTML = '❌ 服务器离线 - 请先启动搜索引擎服务器';
+                document.getElementById('serverStatus').className = 'status offline';
+            }
+        }
+        
+        // 测试搜索功能
+        async function testSearch(query) {
+            testCounter++;
+            const resultId = getResultId();
+            const resultDiv = document.getElementById(resultId);
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `正在搜索 "${query}"...`;
+            resultDiv.className = 'result';
+            
+            try {
+                const startTime = Date.now();
+                const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                const endTime = Date.now();
+                const searchTime = endTime - startTime;
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                const results = data.results || [];
+                
+                let resultText = `搜索查询: "${query}"\n`;
+                resultText += `响应时间: ${searchTime}ms\n`;
+                resultText += `结果数量: ${results.length}\n\n`;
+                
+                if (results.length > 0) {
+                    resultText += '搜索结果:\n';
+                    results.forEach((result, index) => {
+                        resultText += `${index + 1}. ${result.title}\n`;
+                        resultText += `   相关度: ${result.score.toFixed(3)}\n`;
+                        resultText += `   摘要: ${result.content.substring(0, 100)}...\n\n`;
+                    });
+                    resultDiv.className = 'result success';
+                } else {
+                    resultText += '未找到相关结果';
+                    resultDiv.className = 'result';
+                }
+                
+                resultDiv.innerHTML = resultText;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `搜索失败: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        // 性能测试
+        async function performanceTest() {
+            const resultDiv = document.getElementById('performanceResult');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '正在执行性能测试...';
+            resultDiv.className = 'result';
+            
+            const testQueries = ['C++', 'Boost', '搜索引擎', '网络编程', '多线程'];
+            const results = [];
+            
+            try {
+                for (let i = 0; i < testQueries.length; i++) {
+                    const query = testQueries[i];
+                    const startTime = Date.now();
+                    
+                    const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                    const data = await response.json();
+                    
+                    const endTime = Date.now();
+                    const searchTime = endTime - startTime;
+                    
+                    results.push({
+                        query: query,
+                        time: searchTime,
+                        count: data.results ? data.results.length : 0
+                    });
+                    
+                    // 更新进度
+                    resultDiv.innerHTML = `性能测试进度: ${i + 1}/${testQueries.length}`;
+                }
+                
+                // 计算统计信息
+                const totalTime = results.reduce((sum, r) => sum + r.time, 0);
+                const avgTime = totalTime / results.length;
+                const maxTime = Math.max(...results.map(r => r.time));
+                const minTime = Math.min(...results.map(r => r.time));
+                
+                let resultText = '性能测试结果:\n\n';
+                resultText += `总查询数: ${results.length}\n`;
+                resultText += `总耗时: ${totalTime}ms\n`;
+                resultText += `平均响应时间: ${avgTime.toFixed(2)}ms\n`;
+                resultText += `最快响应: ${minTime}ms\n`;
+                resultText += `最慢响应: ${maxTime}ms\n\n`;
+                
+                resultText += '详细结果:\n';
+                results.forEach((result, index) => {
+                    resultText += `${index + 1}. "${result.query}" - ${result.time}ms (${result.count}个结果)\n`;
+                });
+                
+                resultDiv.innerHTML = resultText;
+                resultDiv.className = 'result success';
+                
+            } catch (error) {
+                resultDiv.innerHTML = `性能测试失败: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        // 获取当前测试用例的结果ID
+        function getResultId() {
+            const button = event.target;
+            const testCase = button.closest('.test-case');
+            const resultDiv = testCase.querySelector('.result');
+            return resultDiv.id;
+        }
+        
+        // 页面加载时检查服务器状态
+        window.addEventListener('load', checkServerStatus);
+        
+        // 每30秒检查一次服务器状态
+        setInterval(checkServerStatus, 30000);
+    </script>
+</body>
+</html>
