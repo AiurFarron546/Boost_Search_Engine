@@ -190,10 +190,10 @@ std::string Indexer::parse_html_file(const std::string& file_path) {
 
     // 解码常见的HTML实体
     boost::replace_all(text_content, "&nbsp;", " ");
-    boost::replace_all(text_content, "<", "<");
-    boost::replace_all(text_content, ">", ">");
-    boost::replace_all(text_content, "&", "&");
-    boost::replace_all(text_content, """, "\"");
+    boost::replace_all(text_content, "&lt;", "<");
+    boost::replace_all(text_content, "&gt;", ">");
+    boost::replace_all(text_content, "&amp;", "&");
+    boost::replace_all(text_content, "&quot;", "\"");
 
     // 使用正则表达式将多个连续的空白字符替换为单个空格
     boost::regex whitespace_regex("\\s+");

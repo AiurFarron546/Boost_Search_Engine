@@ -249,19 +249,19 @@ std::map<std::string, int> document_frequency_;
 
 **系统要求：**
 - 操作系统：Windows 10/11 (64位)
-- 编译器：Visual Studio 2017+ 或 MinGW-w64
+- 编译器：Visual Studio 2019+ 或 MinGW-w64 【作者建议两个都配置上，MSVC兼容性最好，MinGW-W64作备用】
 - CMake：3.16或更高版本
 - Boost库：1.70或更高版本
 
 **推荐配置：**
+
 - CPU：Intel i5或AMD Ryzen 5以上
 - 内存：8GB RAM以上
 - 存储：至少1GB可用空间
 
 ### 6.2 依赖安装
-**特别备注：在文件中已经有boost库，可以根据情况直接编译**
+**方法一：使用vcpkg**
 
-**方法一：使用vcpkg（推荐）**
 ```bash
 # 安装vcpkg
 git clone https://github.com/Microsoft/vcpkg.git
@@ -272,19 +272,25 @@ cd vcpkg
 .\vcpkg install boost:x64-windows
 ```
 
-**方法二：手动编译Boost**
+**方法二：手动编译Boost**【作者本人选用此方案】
+
 ```bash
 # 下载Boost源码
 # 从 https://www.boost.org/users/download/ 下载
 
 # 编译Boost
+# 打开命令提示符，进入Boost库的根目录，然后依次输入下列命令
+
 bootstrap.bat
+# 备注：如果默认MSVC无效可以使用 【bootstrap.bat gcc】 指令进行编译，该方式需要配置MinGW-w64环境
+
 b2 --build-type=complete --with-system --with-filesystem --with-thread --with-regex
 ```
 
 ### 6.3 编译步骤
 
-**使用提供的脚本：**
+**使用提供的脚本：**【作者推荐使用此方法】
+
 ```bash
 # 编译项目
 build.bat
@@ -319,6 +325,7 @@ BoostSearchEngine.exe
 - Web文件：./web/
 
 **修改配置：**
+
 ```cpp
 // 在 src/main.cpp 中修改端口
 const short port = 9882;  // 修改为其他端口
@@ -426,6 +433,7 @@ public:
 - 验证文件编码为UTF-8
 
 **搜索问题：**
+
 - 检查中文字符是否正确显示
 - 确认文档内容已正确索引
 - 验证搜索关键词格式
@@ -433,6 +441,7 @@ public:
 ### 8.2 性能调优
 
 **内存优化：**
+
 ```cpp
 // 调整内存分配策略
 documents_.reserve(expected_doc_count);
@@ -440,6 +449,7 @@ inverted_index_.reserve(expected_term_count);
 ```
 
 **I/O优化：**
+
 ```cpp
 // 使用内存映射文件
 boost::iostreams::mapped_file_source file(file_path);
