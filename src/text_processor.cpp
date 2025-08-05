@@ -15,7 +15,7 @@
 #include <boost/algorithm/string.hpp>
 
 TextProcessor::TextProcessor()
-    : word_pattern_("\\b\\w+\\b"),
+    : word_pattern_("([\\u4e00-\\u9fff]+|[a-zA-Z]+\\d*|\\d+)"),
       html_tag_pattern_("<[^>]*>"),
       whitespace_pattern_("\\s+") {
 
@@ -47,17 +47,59 @@ std::string TextProcessor::preprocess_text(const std::string& text) {
 
 std::vector<std::string> TextProcessor::tokenize(const std::string& text) {
     std::vector<std::string> tokens;
-
-    boost::sregex_iterator iter(text.begin(), text.end(), word_pattern_);
+    
+    // 处理英文单词和数字
+    boost::regex english_pattern("[a-zA-Z]+\\d*|\\d+");
+    boost::sregex_iterator english_iter(text.begin(), text.end(), english_pattern);
     boost::sregex_iterator end;
-
-    for (; iter != end; ++iter) {
-        std::string token = iter->str();
-        if (token.length() >= 2) {  // 过滤太短的词
-            tokens.push_back(token);
+    
+    for (; english_iter != end; ++english_iter) {
+        std::string token = english_iter->str();
+        if (token.length() >= 2) {
+            tokens.push_back(to_lower(token));
         }
     }
-
+    
+    // 处理中文字符 - 提取所有中文字符
+    std::vector<std::string> chinese_chars;
+    for (size_t i = 0; i < text.length(); ) {
+        unsigned char c = static_cast<unsigned char>(text[i]);
+        
+        // 检查是否是中文字符的开始（UTF-8编码）
+        if ((c & 0xE0) == 0xE0) {  // 三字节UTF-8字符（大部分中文字符）
+            if (i + 2 < text.length()) {
+                std::string chinese_char = text.substr(i, 3);
+                chinese_chars.push_back(chinese_char);
+                i += 3;
+            } else {
+                i++;
+            }
+        } else {
+            i++;
+        }
+    }
+    
+    // 将中文字符组合成不同长度的词
+    for (size_t i = 0; i < chinese_chars.size(); ++i) {
+        // 单个中文字符
+        tokens.push_back(chinese_chars[i]);
+        
+        // 两字组合
+        if (i + 1 < chinese_chars.size()) {
+            tokens.push_back(chinese_chars[i] + chinese_chars[i+1]);
+        }
+        
+        // 三字组合
+        if (i + 2 < chinese_chars.size()) {
+            tokens.push_back(chinese_chars[i] + chinese_chars[i+1] + chinese_chars[i+2]);
+        }
+        
+        // 四字组合
+        if (i + 3 < chinese_chars.size()) {
+            tokens.push_back(chinese_chars[i] + chinese_chars[i+1] + chinese_chars[i+2] + chinese_chars[i+3]);
+        }
+    }
+    
     return tokens;
 }
 
@@ -159,19 +201,19 @@ void TextProcessor::init_default_stop_words() {
         "come", "made", "may", "part"
     };
 
-    // 中文停用词 (使用拼音表示以避免编码问题)
+    // 中文停用词
     std::vector<std::string> chinese_stop_words = {
-        "de", "le", "zai", "shi", "wo", "you", "he", "jiu", "bu", "ren",
-        "dou", "yi", "yige", "shang", "ye", "hen", "dao", "shuo", "yao",
-        "qu", "ni", "hui", "zhe", "meiyou", "kan", "hao", "ziji", "zhe",
-        "na", "li", "jiushi", "hai", "ba", "bi", "huozhe", "shenme",
-        "keyi", "wei", "danshi", "zhege", "zhong", "lai", "yong", "ta",
-        "ta2", "women", "neng", "xia", "zi", "dui", "ba2", "er", "bei",
-        "zui", "gai", "xie", "you2", "jia", "ke", "yi2", "ruguo", "mei",
-        "duo", "ranhou", "zenme", "chu", "ne", "yu", "qi", "gei", "cong",
-        "shi2", "mei2", "ge", "xianzai", "rang", "yinwei", "dang", "tong",
-        "hui2", "guo", "zhi", "xiang", "shiji", "hou", "zuo", "dian", "qi2",
-        "san", "yu2", "guanyu"
+        "的", "了", "在", "是", "我", "有", "和", "就", "不", "人",
+        "都", "一", "一个", "上", "也", "很", "到", "说", "要",
+        "去", "你", "会", "着", "没有", "看", "好", "自己", "这",
+        "那", "里", "就是", "还", "把", "比", "或者", "什么",
+        "可以", "为", "但是", "这个", "中", "来", "用", "他",
+        "她", "我们", "能", "下", "子", "对", "吧", "而", "被",
+        "最", "该", "些", "又", "家", "可", "以", "如果", "没",
+        "多", "然后", "怎么", "出", "呢", "与", "其", "给", "从",
+        "时", "每", "个", "现在", "让", "因为", "当", "同",
+        "回", "过", "只", "想", "实际", "后", "做", "点", "起",
+        "三", "于", "关于"
     };
 
     // 添加英文停用词
