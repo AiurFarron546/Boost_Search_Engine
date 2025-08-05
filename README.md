@@ -295,7 +295,7 @@ b2 --build-type=complete --with-system --with-filesystem --with-thread --with-re
 # 特别提醒，MSVC 与 GCC 二者编译器在Boost库调用上存在兼容性冲突，如需使用GCC编译器，请转到main分支克隆存储库。
 
 # 编译项目
-build.bat
+build_MSVC.bat
 
 # 运行程序
 run.bat
@@ -474,8 +474,6 @@ boost::iostreams::mapped_file_source file(file_path);
 - 体现了Boost库在实际项目中的应用价值
 - 实现了完整的搜索引擎核心算法
 - 提供了Web服务开发的最佳实践
-
-该项目不仅是一个可用的搜索引擎工具，更是学习现代C++开发、网络编程、搜索算法的优秀案例。通过本项目的开发，深入理解了搜索引擎的工作原理，掌握了高性能服务器开发的关键技术。
 
 ---
 
