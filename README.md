@@ -282,7 +282,6 @@ cd vcpkg
 # 打开命令提示符，进入Boost库的根目录，然后依次输入下列命令
 
 bootstrap.bat
-# 备注：如果默认MSVC无效可以使用 【bootstrap.bat gcc】 指令进行编译，该方式需要配置MinGW-w64环境
 
 b2 --build-type=complete --with-system --with-filesystem --with-thread --with-regex
 ```
@@ -292,6 +291,9 @@ b2 --build-type=complete --with-system --with-filesystem --with-thread --with-re
 **使用提供的脚本：**【作者推荐使用此方法】
 
 ```bash
+# 备注：该版本使用默认设置，编译器为MSVC；
+# 特别提醒，MSVC 与 GCC 二者编译器在Boost库调用上存在兼容性冲突，如需使用GCC编译器，请转到main分支克隆存储库。
+
 # 编译项目
 build.bat
 
