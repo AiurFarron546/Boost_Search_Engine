@@ -18,14 +18,14 @@ class HttpConnection : public boost::enable_shared_from_this<HttpConnection>
 public:
     typedef boost::shared_ptr<HttpConnection> pointer;
 
-    static pointer create(boost::asio::io_service& io_service);
+    static pointer create(boost::asio::io_context& io_context);
 
     tcp::socket& socket();
 
     void start();
 
 private:
-    HttpConnection(boost::asio::io_service& io_service);
+    HttpConnection(boost::asio::io_context& io_context);
 
     void handle_read(const boost::system::error_code& error, size_t bytes_transferred);
     void handle_write(const boost::system::error_code& error);
@@ -56,7 +56,7 @@ private:
 class HttpServer
 {
 public:
-    HttpServer(boost::asio::io_service& io_service, short port);
+    HttpServer(boost::asio::io_context& io_context, short port);
 
 private:
     void start_accept();

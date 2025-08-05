@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 project(BoostSearchEngine)
 
 # 设置C++标准
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 设置编译器标志
@@ -11,19 +11,46 @@ if(MSVC)
     add_definitions(-D_WIN32_WINNT=0x0601)
     add_definitions(-DBOOST_ALL_NO_LIB)
     add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
+elseif(MINGW)
+    # MinGW-w64特定配置
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++")
+    add_definitions(-D_WIN32_WINNT=0x0601)
+    add_definitions(-DBOOST_ALL_NO_LIB)
+    add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
+    # 解决MinGW的一些兼容性问题
+    add_definitions(-DWIN32_LEAN_AND_MEAN)
+    add_definitions(-DNOMINMAX)
+    # 强制静态链接
+    add_definitions(-DBOOST_FILESYSTEM_STATIC_LINK)
+    add_definitions(-DBOOST_SYSTEM_STATIC_LINK)
 endif()
 
-# 查找Boost库
+# 设置Boost路径和配置
+set(BOOST_ROOT "D:/CodeBuddy/CPP_envs/boost_1_88_0")
+set(BOOST_LIBRARYDIR "D:/CodeBuddy/CPP_envs/boost_1_88_0/stage/lib")
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
+set(Boost_NO_SYSTEM_PATHS ON)  # 强制使用指定路径
+
+# 对于MinGW，使用传统的FindBoost模块
+if(MINGW)
+    set(Boost_COMPILER "-mgw8")  # MinGW 8.x
+    set(Boost_ARCHITECTURE "-x64")
+    # 设置调试信息
+    set(Boost_DEBUG ON)
+    # 添加可能的库名后缀
+    set(Boost_LIB_PREFIX "lib")
+    set(CMAKE_FIND_LIBRARY_PREFIXES "lib" "")
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ".a" ".lib")
+endif()
 
 find_package(Boost REQUIRED COMPONENTS 
     system 
     filesystem 
     thread 
     regex
-    locale
 )
 
 if(Boost_FOUND)
@@ -58,14 +85,14 @@ set(HEADERS
 # 创建可执行文件
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
-# 链接库
-target_link_libraries(${PROJECT_NAME} 
+# 链接库 - 使用传统方式链接Boost库
+target_link_libraries(${PROJECT_NAME} PRIVATE
     ${Boost_LIBRARIES}
 )
 
 # Windows特定设置
 if(WIN32)
-    target_link_libraries(${PROJECT_NAME} ws2_32 wsock32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE ws2_32 wsock32)
 endif()
 
 # 设置输出目录

@@ -249,7 +249,7 @@ std::map<std::string, int> document_frequency_;
 
 **系统要求：**
 - 操作系统：Windows 10/11 (64位)
-- 编译器：Visual Studio 2019+ 或 MinGW-w64 【作者建议两个都配置上，MSVC兼容性最好，MinGW-W64作备用】
+- 编译器：MinGW-w64 
 - CMake：3.16或更高版本
 - Boost库：1.70或更高版本
 
@@ -281,8 +281,8 @@ cd vcpkg
 # 编译Boost
 # 打开命令提示符，进入Boost库的根目录，然后依次输入下列命令
 
-bootstrap.bat
-# 备注：如果默认MSVC无效可以使用 【bootstrap.bat gcc】 指令进行编译，该方式需要配置MinGW-w64环境
+bootstrap.bat gcc
+# 备注：需要配置MinGW-w64环境
 
 b2 --build-type=complete --with-system --with-filesystem --with-thread --with-regex
 ```
@@ -291,9 +291,22 @@ b2 --build-type=complete --with-system --with-filesystem --with-thread --with-re
 
 **使用提供的脚本：**【作者推荐使用此方法】
 
+```
+# 请将下列文件中相关代码的路径替换为你自己的Boost库路径即可
+
+<!-- Windows环境下的CMake编译【相关文件名：CMakeLists.txt】 -->
+set(BOOST_ROOT "[Boost路径]")
+set(BOOST_LIBRARYDIR "[Boost路径]/stage/lib")
+
+<!-- MinGw环境下的CMake编译【相关文件名：build.bat】 -->
+cmake .. -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=[Boost路径] -DBOOST_LIBRARYDIR=[Boost路径]/stage/lib -DBoost_NO_SYSTEM_PATHS=ON -DBoost_USE_STATIC_LIBS=ON
+```
+
 ```bash
 # 编译项目
-build.bat
+build_GCC.bat
+
+echo 配置CMake项目...
 
 # 运行程序
 run.bat
