@@ -304,7 +304,7 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=[Boost路径] -DBOOST_LIBRARYDI
 
 ```bash
 # 编译项目
-build_GCC.bat
+build.bat
 
 echo 配置CMake项目...
 
