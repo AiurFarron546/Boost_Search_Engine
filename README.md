@@ -249,7 +249,7 @@ std::map<std::string, int> document_frequency_;
 
 **系统要求：**
 - 操作系统：Windows 10/11 (64位)
-- 编译器：Visual Studio 2019+ 或 MinGW-w64 【作者建议两个都配置上，MSVC兼容性最好，MinGW-W64作备用】
+- 编译器：Visual Studio 2019+ （MSVC编译器）
 - CMake：3.16或更高版本
 - Boost库：1.70或更高版本
 
