@@ -31,16 +31,16 @@ extern SearchEngine* get_search_engine();
  * @param io_service Boost.Asio的io_service对象
  * @return 指向新创建的HttpConnection的共享指针
  */
-HttpConnection::pointer HttpConnection::create(boost::asio::io_service& io_service) {
-    return pointer(new HttpConnection(io_service));
+HttpConnection::pointer HttpConnection::create(boost::asio::io_context& io_context) {
+    return pointer(new HttpConnection(io_context));
 }
 
 /**
  * @brief HttpConnection的构造函数
  * @param io_service Boost.Asio的io_service对象
  */
-HttpConnection::HttpConnection(boost::asio::io_service& io_service)
-    : socket_(io_service) {
+HttpConnection::HttpConnection(boost::asio::io_context& io_context)
+    : socket_(io_context) {
 }
 
 /**
@@ -524,8 +524,8 @@ std::string HttpConnection::simple_gbk_to_utf8(const std::string& gbk_content) {
  * @param io_service Boost.Asio的io_service对象
  * @param port 服务器监听的端口号
  */
-HttpServer::HttpServer(boost::asio::io_service& io_service, short port)
-    : acceptor_(io_service, tcp::endpoint(tcp::v4(), port)) {
+HttpServer::HttpServer(boost::asio::io_context& io_context, short port)
+    : acceptor_(io_context, tcp::endpoint(tcp::v4(), port)) {
     start_accept(); // 开始接受连接
 }
 
@@ -534,7 +534,7 @@ HttpServer::HttpServer(boost::asio::io_service& io_service, short port)
  */
 void HttpServer::start_accept() {
     // 创建一个新的HttpConnection对象来处理下一个连接
-    HttpConnection::pointer new_connection = HttpConnection::create(static_cast<boost::asio::io_service&>(acceptor_.get_executor().context()));
+    HttpConnection::pointer new_connection = HttpConnection::create(static_cast<boost::asio::io_context&>(acceptor_.get_executor().context()));
 
     // 异步等待连接
     acceptor_.async_accept(new_connection->socket(),

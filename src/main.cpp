@@ -76,19 +76,19 @@ int main() {
             return 1;
         }
 
-        // 创建Boost.Asio的I/O服务，用于网络操作
-        boost::asio::io_service io_service;
+        // 创建Boost.Asio的I/O上下文，用于网络操作
+        boost::asio::io_context io_context;
 
         // 创建并启动HTTP服务器，监听指定端口（9882）
-        HttpServer server(io_service, 9882);
+        HttpServer server(io_context, 9882);
 
         std::cout << "HTTP server started, listening on port: 9882" << std::endl;
         std::cout << "Please visit: http://localhost:9882" << std::endl;
         std::cout << "Press Ctrl+C to exit" << std::endl;
 
-        // 运行I/O服务，开始处理异步事件（如HTTP请求）
-        // 此调用会阻塞，直到io_service停止
-        io_service.run();
+        // 运行I/O上下文，开始处理异步事件（如HTTP请求）
+        // 此调用会阻塞，直到io_context停止
+        io_context.run();
     }
     catch (std::exception& e) {
         std::cerr << "Program exception: " << e.what() << std::endl;
