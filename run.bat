@@ -16,7 +16,9 @@ echo 启动搜索引擎服务器...
 REM 启动程序
 build\Release\BoostSearchEngine.exe
 
+echo.
 echo 服务器将在 http://localhost:9882 启动
+echo.
 echo 按 Ctrl+C 停止服务器
 echo.
 
