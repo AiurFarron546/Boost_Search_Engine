@@ -260,19 +260,31 @@ std::map<std::string, int> document_frequency_;
 - 存储：至少1GB可用空间
 
 ### 6.2 依赖安装
-**方法一：使用vcpkg**
+**方法一：使用Msys2**【作者本人选用此方案】
+
+启动正确的终端环境：
+
+从开始菜单或你的 MSYS2 安装目录下，启动 MSYS2 UCRT64。这一点至关重要！ 这个终端环境配置了 UCRT 工具链的所有路径和变量。千万不要在 MSYS2 或 MINGW64 环境中进行安装。
+
+更新包数据库（可选但推荐）：
+
 
 ```bash
-# 安装vcpkg
-git clone https://github.com/Microsoft/vcpkg.git
-cd vcpkg
-.\bootstrap-vcpkg.bat
-
-# 安装Boost库
-.\vcpkg install boost:x64-windows
+pacman -Syu
 ```
+如果提示关闭终端，请照做，然后重新打开 UCRT64 终端再次运行 pacman -Syu 直到系统完全更新。
 
-**方法二：手动编译Boost**【作者本人选用此方案】
+安装 Boost 开发包：
+Boost 库被分成了多个包。你需要安装 boost 元包，它包含了常用的库。
+
+```bash
+pacman -S mingw-w64-ucrt-x86_64-boost
+```
+mingw-w64-ucrt-x86_64- 是前缀，表明这是用于 UCRT64 环境的包。
+
+这个命令会安装 Boost 的头文件（在 /ucrt64/include/boost）和预编译的动态链接库（.dll 文件在 /ucrt64/bin，对应的 .a 导入库文件在 /ucrt64/lib）。
+
+**方法二：手动编译Boost**
 
 ```bash
 # 下载Boost源码
@@ -289,17 +301,19 @@ b2 --build-type=complete --with-system --with-filesystem --with-thread --with-re
 
 ### 6.3 编译步骤
 
-**使用提供的脚本：**【作者推荐使用此方法】
+**使用提供的脚本：**【作者本人选用此方案】
 
 ```
-# 请将下列文件中相关代码的路径替换为你自己的Boost库路径即可
+# 请将下列文件中相关代码的路径替换为你自己的 Msys2 - Boost 库路径即可
 
 <!-- Windows环境下的CMake编译【相关文件名：CMakeLists.txt】 -->
-set(BOOST_ROOT "[Boost路径]")
-set(BOOST_LIBRARYDIR "[Boost路径]/stage/lib")
+# 设置Boost路径和配置 - 使用MSYS2的UCRT64环境
+set(BOOST_ROOT "C:/msys64/ucrt64")
+set(BOOST_LIBRARYDIR "C:/msys64/ucrt64/lib")
+set(Boost_INCLUDE_DIR "C:/msys64/ucrt64/include")
 
-<!-- MinGw环境下的CMake编译【相关文件名：build.bat】 -->
-cmake .. -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=[Boost路径] -DBOOST_LIBRARYDIR=[Boost路径]/stage/lib -DBoost_NO_SYSTEM_PATHS=ON -DBoost_USE_STATIC_LIBS=ON
+# 设置Boost查找路径
+set(CMAKE_PREFIX_PATH "C:/msys64/ucrt64" ${CMAKE_PREFIX_PATH})
 ```
 
 ```bash
@@ -319,7 +333,7 @@ mkdir build
 cd build
 
 # 配置CMake
-cmake .. -DCMAKE_TOOLCHAIN_FILE=[vcpkg路径]/scripts/buildsystems/vcpkg.cmake
+cmake .. -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=[Boost路径] -DBOOST_LIBRARYDIR=[Boost路径]/stage/lib -DBoost_NO_SYSTEM_PATHS=ON -DBoost_USE_STATIC_LIBS=ON
 
 # 编译项目
 cmake --build . --config Release
@@ -500,4 +514,4 @@ boost::iostreams::mapped_file_source file(file_path);
 
 ---
 
-*最后更新：2024年7月*
+*最后更新：2024年8月*
