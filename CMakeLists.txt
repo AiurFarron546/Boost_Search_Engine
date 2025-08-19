@@ -36,25 +36,28 @@ else()
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g")
 endif()
 
-# 设置Boost路径和配置
-set(BOOST_ROOT "D:/CodeBuddy/CPP_envs/boost_1_88_0")
-set(BOOST_LIBRARYDIR "D:/CodeBuddy/CPP_envs/boost_1_88_0/stage/lib")
+# 设置Boost路径和配置 - 使用MSYS2的UCRT64环境
+set(BOOST_ROOT "C:/msys64/ucrt64")
+set(BOOST_LIBRARYDIR "C:/msys64/ucrt64/lib")
+set(Boost_INCLUDE_DIR "C:/msys64/ucrt64/include")
+
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 set(Boost_NO_SYSTEM_PATHS ON)  # 强制使用指定路径
 
-# 对于MinGW，使用传统的FindBoost模块
+# 对于MinGW/MSYS2，使用传统的FindBoost模块
 if(MINGW)
-    set(Boost_COMPILER "-mgw15")  # MinGW 15.x
-    set(Boost_ARCHITECTURE "-x64")
-    # 设置调试信息
+    # MSYS2 UCRT64环境
     set(Boost_DEBUG ON)
     # 添加可能的库名后缀
     set(Boost_LIB_PREFIX "lib")
     set(CMAKE_FIND_LIBRARY_PREFIXES "lib" "")
-    set(CMAKE_FIND_LIBRARY_SUFFIXES ".a" ".lib")
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ".dll.a" ".a" ".lib")
 endif()
+
+# 设置Boost查找路径
+set(CMAKE_PREFIX_PATH "C:/msys64/ucrt64" ${CMAKE_PREFIX_PATH})
 
 find_package(Boost REQUIRED COMPONENTS 
     system 
