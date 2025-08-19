@@ -43,4 +43,7 @@ echo.
 echo 可执行文件位置: build\BoostSearchEngine.exe
 echo.
 echo 运行程序请执行: run.bat
+
+cd ..
+
 pause

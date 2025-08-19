@@ -46,7 +46,7 @@ set(Boost_NO_SYSTEM_PATHS ON)  # 强制使用指定路径
 
 # 对于MinGW，使用传统的FindBoost模块
 if(MINGW)
-    set(Boost_COMPILER "-mgw8")  # MinGW 8.x
+    set(Boost_COMPILER "-mgw15")  # MinGW 15.x
     set(Boost_ARCHITECTURE "-x64")
     # 设置调试信息
     set(Boost_DEBUG ON)
